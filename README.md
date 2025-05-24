@@ -43,28 +43,21 @@ Before starting, ensure you have the following:
 
 ### Installation
 
-1. **Clone the Repository**:
+1. **Clone the Repository**
    ```bash
    git clone https://github.com/yourusername/bug-bounty-automation-agent.git
    cd bug-bounty-automation-agent
-Install Dependencies:
-If your extension has external dependencies (e.g., for crawling or network requests):
-
-bash
-Copy
-Edit
-npm install
-Load the Extension in Chrome:
-
-Go to chrome://extensions/
-
-Enable Developer Mode
-
-Click Load unpacked and select the folder containing your extension files.
-
-Configure the Extension:
-
-You can configure scan options or tweak vulnerability tests before running them via the UI.
+   ```
+2. **Install Dependencies** (if your extension has external packages)
+   ```bash
+   npm install
+   ```
+3. **Load the Extension in Chrome**
+   - Go to `chrome://extensions/`.
+   - Enable **Developer Mode**.
+   - Click **Load unpacked** and select the `extension/` folder.
+4. **Configure the Extension**
+   - Adjust scan options or tweak vulnerability tests in the UI as needed.
 
 Extension Architecture
 The extension consists of the following parts:
@@ -89,12 +82,10 @@ These vulnerabilities occur when an attacker can inject malicious code into inpu
 Description: Malicious input in query strings or form fields can allow an attacker to execute arbitrary SQL commands.
 
 Test: Inject SQL payloads into form fields and URL parameters. Payloads include:
-
-javascript
-Copy
-Edit
-"' OR 1=1 --"
-"' UNION SELECT null, null --"
+```sql
+' OR 1=1 --
+' UNION SELECT null, null --
+```
 AI Workflow:
 
 For each form and URL parameter, inject common SQL payloads.
@@ -105,11 +96,9 @@ If the server returns error messages related to SQL, flag it as vulnerable.
 Description: Similar to SQL injection, but targeting NoSQL databases like MongoDB.
 
 Test: Inject NoSQL-specific payloads like:
-
-javascript
-Copy
-Edit
+```json
 { "$ne": "" }
+```
 AI Workflow:
 
 For input fields that interact with NoSQL databases, inject NoSQL-specific payloads.
@@ -120,12 +109,10 @@ Detect error messages or unusual database behavior.
 Description: Allows attackers to execute system commands through unsanitized user input.
 
 Test: Inject OS command payloads such as:
-
-javascript
-Copy
-Edit
-"; ls"
-"| cat /etc/passwd"
+```bash
+; ls
+| cat /etc/passwd
+```
 AI Workflow:
 
 Inject OS commands into input fields or URL parameters.
@@ -179,11 +166,9 @@ Client-Side Attacks
 Description: Injecting malicious JavaScript into web pages that executes in users’ browsers.
 
 Test: Inject common XSS payloads such as:
-
-javascript
-Copy
-Edit
+```html
 <script>alert('XSS')</script>
+```
 AI Workflow:
 
 Inject XSS payloads into forms, URL parameters, and cookies.
@@ -212,18 +197,14 @@ AI Workflow:
 Identify XML input points.
 
 Inject XXE payloads like:
-
-xml
-Copy
-Edit
+```xml
 <!ENTITY xxe SYSTEM "file:///etc/passwd">
+```
 Implementation Steps
 Crawling the Site
 To perform a complete scan, the agent first needs to crawl the website:
 
-javascript
-Copy
-Edit
+```javascript
 function crawlSite(url) {
   fetch(url)
     .then(response => response.text())
@@ -232,12 +213,11 @@ function crawlSite(url) {
       links.forEach(link => crawlSite(link)); // Recursively crawl links
     });
 }
+```
 Injecting Test Payloads
 Once crawling is complete, the agent will inject test payloads into all detected form fields and URL parameters. The content.js script will handle this by finding form fields and injecting predefined malicious inputs.
 
-javascript
-Copy
-Edit
+```javascript
 function injectXSSPayload() {
   let payloads = ["<script>alert('XSS')</script>", "<img src='x' onerror='alert(1)'>"];
   let inputs = document.querySelectorAll("input, textarea");
@@ -248,12 +228,11 @@ function injectXSSPayload() {
     });
   });
 }
+```
 Reporting Findings
 The background script will collect findings and pass them to the UI for display.
 
-javascript
-Copy
-Edit
+```javascript
 function reportVulnerability(vulnerability, severity) {
   chrome.runtime.sendMessage({
     action: "reportVulnerability",
@@ -261,6 +240,7 @@ function reportVulnerability(vulnerability, severity) {
     severity: severity
   });
 }
+```
 UI/UX Design
 The UI should allow users to:
 
@@ -269,22 +249,16 @@ Start a Scan: A button that starts the vulnerability scanning process.
 View Results: A list of vulnerabilities found, categorized by severity.
 
 Detailed View: Expandable details for each vulnerability (e.g., description, impact, mitigation).
-
-html
-Copy
-Edit
+```html
 <button id="scanBtn">Start Scan</button>
 <div id="results"></div>
+```
 Conclusion
 This Bug Bounty Automation Agent uses a combination of content scripts, background workers, and crawlers to scan web pages for a wide range of vulnerabilities. The agent automates the process of discovering vulnerabilities like SQL Injection, XSS, IDOR, and more, making it easier for bug bounty hunters to identify potential security flaws.
 
 You can contribute by adding more checks, improving the crawler’s performance, or providing new payloads for specific vulnerabilities. This tool is designed for educational purposes and should only be used on websites where you have explicit permission to perform security testing.
 
 This README outlines everything needed for the AI agent to understand how to perform web security testing. It covers crawling, vulnerability detection, reporting, and UI interaction. If you’re ready to implement it, the next steps involve coding the extension using the instructions provided.
-
-vbnet
-Copy
-Edit
 
 ### **Key Concepts Covered in This README**:
 1. **Vulnerability Detection**: Instructions for each type of vulnerability and how the agent should test for them.
