@@ -1,0 +1,19 @@
+# Node dependencies
+node_modules/
+
+# Build artifacts
+/dist/
+/build/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+
+# Env files
+.env
+
+# Chrome extension packaged files
+*.crx
+*.pem
